@@ -37,6 +37,7 @@ import lombok.NonNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class TextWriteStrategy extends AbstractWriteStrategy {
             if (isFirstWrite.get(filePath)) {
                 isFirstWrite.put(filePath, false);
             } else {
-                fsDataOutputStream.write(rowDelimiter.getBytes());
+                fsDataOutputStream.write(rowDelimiter.getBytes(StandardCharsets.UTF_8));
             }
             fsDataOutputStream.write(
                     serializationSchema.serialize(
@@ -166,8 +167,8 @@ public class TextWriteStrategy extends AbstractWriteStrategy {
                     String.join(
                                     FileFormat.CSV.equals(fileFormat) ? "," : fieldDelimiter,
                                     seaTunnelRowType.getFieldNames())
-                            .getBytes());
-            fsDataOutputStream.write(rowDelimiter.getBytes());
+                            .getBytes(StandardCharsets.UTF_8));
+            fsDataOutputStream.write(rowDelimiter.getBytes(StandardCharsets.UTF_8));
         }
     }
 }
