@@ -33,6 +33,7 @@ import org.apache.seatunnel.format.text.exception.SeaTunnelTextFormatException;
 
 import lombok.NonNull;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -121,7 +122,7 @@ public class TextSerializationSchema implements SerializationSchema {
         for (int i = 0; i < fields.length; i++) {
             strings[i] = convert(fields[i], seaTunnelRowType.getFieldType(i), 0);
         }
-        return String.join(separators[0], strings).getBytes();
+        return String.join(separators[0], strings).getBytes(StandardCharsets.UTF_8);
     }
 
     private String convert(Object field, SeaTunnelDataType<?> fieldType, int level) {

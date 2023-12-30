@@ -1,0 +1,1 @@
+{"boolean_col":2,"tinyint_col":2,"smallint_col":3,"int_col":4,"bigint_col":5,"float_col":6.6,"double_col":7.7,"decimal_col":8.8,"string_col":"字符串列\n并换行","varchar_col":"可变字符列\n并换行","char_col":"字符列\n并换行","binary_col":"5LqM6L+b5Yi25YiXCuW5tuaNouihjA==","timestamp_col":"2022-09-19T18:30:20","date_col":"2022-09-19","array_col":null,"map_col":null,"struct_col":null}

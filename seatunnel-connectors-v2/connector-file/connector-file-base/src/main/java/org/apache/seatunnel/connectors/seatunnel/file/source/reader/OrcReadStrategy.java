@@ -56,6 +56,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -357,12 +359,26 @@ public class OrcReadStrategy extends AbstractReadStrategy {
         Object bytesObj = null;
         if (!colVec.isNull[rowNum]) {
             BytesColumnVector bytesVector = (BytesColumnVector) colVec;
-            bytesObj = bytesVector.toString(rowNum);
+            bytesObj = bytesVectorToString(bytesVector, rowNum);
             if (typeDescription.getCategory() == TypeDescription.Category.BINARY) {
-                bytesObj = ((String) bytesObj).getBytes();
+                bytesObj = ((String) bytesObj).getBytes(StandardCharsets.UTF_8);
             }
         }
         return bytesObj;
+    }
+
+    public String bytesVectorToString(BytesColumnVector bytesVector, int row) {
+        Charset charset = StandardCharsets.UTF_8;
+        if (bytesVector.isRepeating) {
+            row = 0;
+        }
+        return !bytesVector.noNulls && bytesVector.isNull[row]
+                ? null
+                : new String(
+                        bytesVector.vector[row],
+                        bytesVector.start[row],
+                        bytesVector.length[row],
+                        charset);
     }
 
     private Object readDecimalVal(ColumnVector colVec, int rowNum) {

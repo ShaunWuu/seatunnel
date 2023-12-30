@@ -33,6 +33,7 @@ import lombok.NonNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class JsonWriteStrategy extends AbstractWriteStrategy {
         super(textFileSinkConfig);
         this.beingWrittenOutputStream = new LinkedHashMap<>();
         this.isFirstWrite = new HashMap<>();
-        this.rowDelimiter = textFileSinkConfig.getRowDelimiter().getBytes();
+        this.rowDelimiter = textFileSinkConfig.getRowDelimiter().getBytes(StandardCharsets.UTF_8);
     }
 
     @Override

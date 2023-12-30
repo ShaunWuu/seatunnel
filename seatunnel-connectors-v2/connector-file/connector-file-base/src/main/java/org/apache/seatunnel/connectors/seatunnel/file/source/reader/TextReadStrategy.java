@@ -87,7 +87,8 @@ public class TextReadStrategy extends AbstractReadStrategy {
                             line -> {
                                 try {
                                     SeaTunnelRow seaTunnelRow =
-                                            deserializationSchema.deserialize(line.getBytes());
+                                            deserializationSchema.deserialize(
+                                                    line.getBytes(StandardCharsets.UTF_8));
                                     if (!readColumns.isEmpty()) {
                                         // need column projection
                                         Object[] fields;
