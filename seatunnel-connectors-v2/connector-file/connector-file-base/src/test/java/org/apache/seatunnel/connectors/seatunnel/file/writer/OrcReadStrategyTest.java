@@ -17,9 +17,7 @@
 
 package org.apache.seatunnel.connectors.seatunnel.file.writer;
 
-import org.apache.seatunnel.shade.com.typesafe.config.Config;
-import org.apache.seatunnel.shade.com.typesafe.config.ConfigFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.seatunnel.api.source.Collector;
 import org.apache.seatunnel.api.table.catalog.CatalogTableUtil;
 import org.apache.seatunnel.api.table.type.SeaTunnelRow;
@@ -29,11 +27,10 @@ import org.apache.seatunnel.connectors.seatunnel.file.config.HadoopConf;
 import org.apache.seatunnel.connectors.seatunnel.file.source.reader.OrcReadStrategy;
 import org.apache.seatunnel.connectors.seatunnel.file.source.reader.ReadStrategy;
 import org.apache.seatunnel.connectors.seatunnel.file.source.reader.ReadStrategyFactory;
-
+import org.apache.seatunnel.shade.com.typesafe.config.Config;
+import org.apache.seatunnel.shade.com.typesafe.config.ConfigFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.net.URL;
@@ -146,6 +143,10 @@ public class OrcReadStrategyTest {
             String field2 = (String) row.getField(2);
             String field3 = new String((byte[]) row.getField(3), StandardCharsets.UTF_8);
             Assertions.assertTrue(isEncoding(field0, ORIGIN_STRING_0, charset));
+            log.error(field0);
+            log.error(field1);
+            log.error(field2);
+            log.error(field3);
             Assertions.assertTrue(isEncoding(field1, ORIGIN_STRING_1, charset));
             Assertions.assertTrue(isEncoding(field2, ORIGIN_STRING_2, charset));
             Assertions.assertTrue(isEncoding(field3, ORIGIN_STRING_3, charset));

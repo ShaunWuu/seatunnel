@@ -17,6 +17,8 @@
 
 package org.apache.seatunnel.connectors.seatunnel.file.sink.util;
 
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.seatunnel.api.table.type.SeaTunnelDataType;
 import org.apache.seatunnel.api.table.type.SeaTunnelRow;
 import org.apache.seatunnel.api.table.type.SeaTunnelRowType;
@@ -29,17 +31,10 @@ import org.apache.seatunnel.common.utils.TimeUtils;
 import org.apache.seatunnel.connectors.seatunnel.file.exception.FileConnectorException;
 import org.apache.seatunnel.connectors.seatunnel.file.sink.config.FileSinkConfig;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -225,7 +220,7 @@ public class ExcelGenerator {
             case NULL:
                 return "";
             case BYTES:
-                return new String((byte[]) field);
+                return new String((byte[]) field, StandardCharsets.UTF_8);
             case ROW:
                 Object[] fields = ((SeaTunnelRow) field).getFields();
                 String[] strings = new String[fields.length];
