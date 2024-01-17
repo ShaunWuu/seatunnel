@@ -17,6 +17,8 @@
 
 package org.apache.seatunnel.connectors.seatunnel.file.source.reader;
 
+import io.airlift.compress.lzo.LzopCodec;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.seatunnel.api.serialization.DeserializationSchema;
 import org.apache.seatunnel.api.source.Collector;
 import org.apache.seatunnel.api.table.type.SeaTunnelRow;
@@ -28,9 +30,6 @@ import org.apache.seatunnel.connectors.seatunnel.file.config.CompressFormat;
 import org.apache.seatunnel.connectors.seatunnel.file.config.HadoopConf;
 import org.apache.seatunnel.connectors.seatunnel.file.exception.FileConnectorException;
 import org.apache.seatunnel.format.json.JsonDeserializationSchema;
-
-import io.airlift.compress.lzo.LzopCodec;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -93,7 +92,8 @@ public class JsonReadStrategy extends AbstractReadStrategy {
                             line -> {
                                 try {
                                     SeaTunnelRow seaTunnelRow =
-                                            deserializationSchema.deserialize(line.getBytes());
+                                            deserializationSchema.deserialize(
+                                                    line.getBytes(StandardCharsets.UTF_8));
                                     if (isMergePartition) {
                                         int index = seaTunnelRowType.getTotalFields();
                                         for (String value : partitionsMap.values()) {

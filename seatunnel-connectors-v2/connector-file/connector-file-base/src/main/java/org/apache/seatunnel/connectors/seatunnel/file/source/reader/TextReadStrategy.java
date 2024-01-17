@@ -17,6 +17,8 @@
 
 package org.apache.seatunnel.connectors.seatunnel.file.source.reader;
 
+import io.airlift.compress.lzo.LzopCodec;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.seatunnel.api.common.SeaTunnelAPIErrorCode;
 import org.apache.seatunnel.api.configuration.ReadonlyConfig;
 import org.apache.seatunnel.api.serialization.DeserializationSchema;
@@ -35,9 +37,6 @@ import org.apache.seatunnel.connectors.seatunnel.file.exception.FileConnectorErr
 import org.apache.seatunnel.connectors.seatunnel.file.exception.FileConnectorException;
 import org.apache.seatunnel.format.text.TextDeserializationSchema;
 import org.apache.seatunnel.format.text.constant.TextFormatConstant;
-
-import io.airlift.compress.lzo.LzopCodec;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -87,7 +86,8 @@ public class TextReadStrategy extends AbstractReadStrategy {
                             line -> {
                                 try {
                                     SeaTunnelRow seaTunnelRow =
-                                            deserializationSchema.deserialize(line.getBytes());
+                                            deserializationSchema.deserialize(
+                                                    line.getBytes(StandardCharsets.UTF_8));
                                     if (!readColumns.isEmpty()) {
                                         // need column projection
                                         Object[] fields;

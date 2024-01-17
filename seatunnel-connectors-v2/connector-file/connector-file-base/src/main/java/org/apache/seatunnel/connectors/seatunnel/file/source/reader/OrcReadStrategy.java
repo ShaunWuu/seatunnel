@@ -17,20 +17,7 @@
 
 package org.apache.seatunnel.connectors.seatunnel.file.source.reader;
 
-import org.apache.seatunnel.api.source.Collector;
-import org.apache.seatunnel.api.table.type.ArrayType;
-import org.apache.seatunnel.api.table.type.BasicType;
-import org.apache.seatunnel.api.table.type.DecimalType;
-import org.apache.seatunnel.api.table.type.LocalTimeType;
-import org.apache.seatunnel.api.table.type.MapType;
-import org.apache.seatunnel.api.table.type.PrimitiveByteArrayType;
-import org.apache.seatunnel.api.table.type.SeaTunnelDataType;
-import org.apache.seatunnel.api.table.type.SeaTunnelRow;
-import org.apache.seatunnel.api.table.type.SeaTunnelRowType;
-import org.apache.seatunnel.common.exception.CommonErrorCodeDeprecated;
-import org.apache.seatunnel.connectors.seatunnel.file.exception.FileConnectorErrorCode;
-import org.apache.seatunnel.connectors.seatunnel.file.exception.FileConnectorException;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
@@ -39,30 +26,21 @@ import org.apache.orc.OrcFile;
 import org.apache.orc.Reader;
 import org.apache.orc.RecordReader;
 import org.apache.orc.TypeDescription;
-import org.apache.orc.storage.ql.exec.vector.BytesColumnVector;
-import org.apache.orc.storage.ql.exec.vector.ColumnVector;
-import org.apache.orc.storage.ql.exec.vector.DecimalColumnVector;
-import org.apache.orc.storage.ql.exec.vector.DoubleColumnVector;
-import org.apache.orc.storage.ql.exec.vector.ListColumnVector;
-import org.apache.orc.storage.ql.exec.vector.LongColumnVector;
-import org.apache.orc.storage.ql.exec.vector.MapColumnVector;
-import org.apache.orc.storage.ql.exec.vector.StructColumnVector;
-import org.apache.orc.storage.ql.exec.vector.TimestampColumnVector;
-import org.apache.orc.storage.ql.exec.vector.UnionColumnVector;
-import org.apache.orc.storage.ql.exec.vector.VectorizedRowBatch;
-
-import lombok.extern.slf4j.Slf4j;
+import org.apache.orc.storage.ql.exec.vector.*;
+import org.apache.seatunnel.api.source.Collector;
+import org.apache.seatunnel.api.table.type.*;
+import org.apache.seatunnel.common.exception.CommonErrorCodeDeprecated;
+import org.apache.seatunnel.connectors.seatunnel.file.exception.FileConnectorErrorCode;
+import org.apache.seatunnel.connectors.seatunnel.file.exception.FileConnectorException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.apache.seatunnel.connectors.seatunnel.file.sink.writer.OrcWriteStrategy.buildFieldWithRowType;
 
@@ -357,12 +335,26 @@ public class OrcReadStrategy extends AbstractReadStrategy {
         Object bytesObj = null;
         if (!colVec.isNull[rowNum]) {
             BytesColumnVector bytesVector = (BytesColumnVector) colVec;
-            bytesObj = bytesVector.toString(rowNum);
+            bytesObj = bytesVectorToString(bytesVector, rowNum);
             if (typeDescription.getCategory() == TypeDescription.Category.BINARY) {
-                bytesObj = ((String) bytesObj).getBytes();
+                bytesObj = ((String) bytesObj).getBytes(StandardCharsets.UTF_8);
             }
         }
         return bytesObj;
+    }
+
+    public String bytesVectorToString(BytesColumnVector bytesVector, int row) {
+        Charset charset = StandardCharsets.UTF_8;
+        if (bytesVector.isRepeating) {
+            row = 0;
+        }
+        return !bytesVector.noNulls && bytesVector.isNull[row]
+                ? null
+                : new String(
+                        bytesVector.vector[row],
+                        bytesVector.start[row],
+                        bytesVector.length[row],
+                        charset);
     }
 
     private Object readDecimalVal(ColumnVector colVec, int rowNum) {
@@ -626,7 +618,7 @@ public class OrcReadStrategy extends AbstractReadStrategy {
                 int vecStart = bytesVec.start[offset + i];
                 byte[] vecCopy = Arrays.copyOfRange(byteArray, vecStart, vecStart + vecLen);
                 if (childType.getCategory() == TypeDescription.Category.STRING) {
-                    String str = new String(vecCopy);
+                    String str = new String(vecCopy, StandardCharsets.UTF_8);
                     bytesValList.add(str);
                 } else {
                     bytesValList.add(vecCopy);

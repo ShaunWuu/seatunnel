@@ -17,13 +17,10 @@
 
 package org.apache.seatunnel.format.text;
 
+import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.seatunnel.api.serialization.DeserializationSchema;
-import org.apache.seatunnel.api.table.type.ArrayType;
-import org.apache.seatunnel.api.table.type.BasicType;
-import org.apache.seatunnel.api.table.type.MapType;
-import org.apache.seatunnel.api.table.type.SeaTunnelDataType;
-import org.apache.seatunnel.api.table.type.SeaTunnelRow;
-import org.apache.seatunnel.api.table.type.SeaTunnelRowType;
+import org.apache.seatunnel.api.table.type.*;
 import org.apache.seatunnel.common.exception.CommonErrorCodeDeprecated;
 import org.apache.seatunnel.common.utils.DateTimeUtils;
 import org.apache.seatunnel.common.utils.DateUtils;
@@ -31,12 +28,9 @@ import org.apache.seatunnel.common.utils.TimeUtils;
 import org.apache.seatunnel.format.text.constant.TextFormatConstant;
 import org.apache.seatunnel.format.text.exception.SeaTunnelTextFormatException;
 
-import org.apache.commons.lang3.StringUtils;
-
-import lombok.NonNull;
-
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -113,7 +107,7 @@ public class TextDeserializationSchema implements DeserializationSchema<SeaTunne
 
     @Override
     public SeaTunnelRow deserialize(byte[] message) throws IOException {
-        String content = new String(message);
+        String content = new String(message, StandardCharsets.UTF_8);
         Map<Integer, String> splitsMap = splitLineBySeaTunnelRowType(content, seaTunnelRowType, 0);
         Object[] objects = new Object[seaTunnelRowType.getTotalFields()];
         for (int i = 0; i < objects.length; i++) {
@@ -217,7 +211,7 @@ public class TextDeserializationSchema implements DeserializationSchema<SeaTunne
             case NULL:
                 return null;
             case BYTES:
-                return field.getBytes();
+                return field.getBytes(StandardCharsets.UTF_8);
             case DATE:
                 return DateUtils.parse(field, dateFormatter);
             case TIME:

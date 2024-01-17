@@ -17,13 +17,9 @@
 
 package org.apache.seatunnel.format.text;
 
+import lombok.NonNull;
 import org.apache.seatunnel.api.serialization.SerializationSchema;
-import org.apache.seatunnel.api.table.type.ArrayType;
-import org.apache.seatunnel.api.table.type.BasicType;
-import org.apache.seatunnel.api.table.type.MapType;
-import org.apache.seatunnel.api.table.type.SeaTunnelDataType;
-import org.apache.seatunnel.api.table.type.SeaTunnelRow;
-import org.apache.seatunnel.api.table.type.SeaTunnelRowType;
+import org.apache.seatunnel.api.table.type.*;
 import org.apache.seatunnel.common.exception.CommonErrorCodeDeprecated;
 import org.apache.seatunnel.common.utils.DateTimeUtils;
 import org.apache.seatunnel.common.utils.DateUtils;
@@ -31,8 +27,7 @@ import org.apache.seatunnel.common.utils.TimeUtils;
 import org.apache.seatunnel.format.text.constant.TextFormatConstant;
 import org.apache.seatunnel.format.text.exception.SeaTunnelTextFormatException;
 
-import lombok.NonNull;
-
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -121,7 +116,7 @@ public class TextSerializationSchema implements SerializationSchema {
         for (int i = 0; i < fields.length; i++) {
             strings[i] = convert(fields[i], seaTunnelRowType.getFieldType(i), 0);
         }
-        return String.join(separators[0], strings).getBytes();
+        return String.join(separators[0], strings).getBytes(StandardCharsets.UTF_8);
     }
 
     private String convert(Object field, SeaTunnelDataType<?> fieldType, int level) {
@@ -148,7 +143,7 @@ public class TextSerializationSchema implements SerializationSchema {
             case NULL:
                 return "";
             case BYTES:
-                return new String((byte[]) field);
+                return new String((byte[]) field, StandardCharsets.UTF_8);
             case ARRAY:
                 BasicType<?> elementType = ((ArrayType<?, ?>) fieldType).getElementType();
                 return Arrays.stream((Object[]) field)
