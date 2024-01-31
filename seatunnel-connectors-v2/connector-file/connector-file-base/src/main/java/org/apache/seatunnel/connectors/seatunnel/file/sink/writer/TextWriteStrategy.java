@@ -17,6 +17,9 @@
 
 package org.apache.seatunnel.connectors.seatunnel.file.sink.writer;
 
+import io.airlift.compress.lzo.LzopCodec;
+import lombok.NonNull;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.seatunnel.api.serialization.SerializationSchema;
 import org.apache.seatunnel.api.table.type.SeaTunnelRow;
 import org.apache.seatunnel.api.table.type.SeaTunnelRowType;
@@ -30,13 +33,9 @@ import org.apache.seatunnel.connectors.seatunnel.file.exception.FileConnectorExc
 import org.apache.seatunnel.connectors.seatunnel.file.sink.config.FileSinkConfig;
 import org.apache.seatunnel.format.text.TextSerializationSchema;
 
-import org.apache.hadoop.fs.FSDataOutputStream;
-
-import io.airlift.compress.lzo.LzopCodec;
-import lombok.NonNull;
-
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -89,7 +88,7 @@ public class TextWriteStrategy extends AbstractWriteStrategy {
             if (isFirstWrite.get(filePath)) {
                 isFirstWrite.put(filePath, false);
             } else {
-                fsDataOutputStream.write(rowDelimiter.getBytes());
+                fsDataOutputStream.write(rowDelimiter.getBytes(StandardCharsets.UTF_8));
             }
             fsDataOutputStream.write(
                     serializationSchema.serialize(
@@ -166,8 +165,8 @@ public class TextWriteStrategy extends AbstractWriteStrategy {
                     String.join(
                                     FileFormat.CSV.equals(fileFormat) ? "," : fieldDelimiter,
                                     seaTunnelRowType.getFieldNames())
-                            .getBytes());
-            fsDataOutputStream.write(rowDelimiter.getBytes());
+                            .getBytes(StandardCharsets.UTF_8));
+            fsDataOutputStream.write(rowDelimiter.getBytes(StandardCharsets.UTF_8));
         }
     }
 }

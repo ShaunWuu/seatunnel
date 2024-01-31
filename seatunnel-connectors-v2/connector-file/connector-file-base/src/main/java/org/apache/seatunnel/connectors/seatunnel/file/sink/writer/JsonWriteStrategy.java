@@ -17,6 +17,9 @@
 
 package org.apache.seatunnel.connectors.seatunnel.file.sink.writer;
 
+import io.airlift.compress.lzo.LzopCodec;
+import lombok.NonNull;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.seatunnel.api.serialization.SerializationSchema;
 import org.apache.seatunnel.api.table.type.SeaTunnelRow;
 import org.apache.seatunnel.api.table.type.SeaTunnelRowType;
@@ -26,13 +29,9 @@ import org.apache.seatunnel.connectors.seatunnel.file.exception.FileConnectorExc
 import org.apache.seatunnel.connectors.seatunnel.file.sink.config.FileSinkConfig;
 import org.apache.seatunnel.format.json.JsonSerializationSchema;
 
-import org.apache.hadoop.fs.FSDataOutputStream;
-
-import io.airlift.compress.lzo.LzopCodec;
-import lombok.NonNull;
-
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -47,7 +46,7 @@ public class JsonWriteStrategy extends AbstractWriteStrategy {
         super(textFileSinkConfig);
         this.beingWrittenOutputStream = new LinkedHashMap<>();
         this.isFirstWrite = new HashMap<>();
-        this.rowDelimiter = textFileSinkConfig.getRowDelimiter().getBytes();
+        this.rowDelimiter = textFileSinkConfig.getRowDelimiter().getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
