@@ -233,7 +233,7 @@ public class TextDeserializationSchema implements DeserializationSchema<SeaTunne
             case NULL:
                 return null;
             case BYTES:
-                return field.getBytes();
+                return field.getBytes(StandardCharsets.UTF_8);
             case DATE:
                 return DateUtils.parse(field, dateFormatter);
             case TIME:

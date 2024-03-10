@@ -162,7 +162,7 @@ public class TextReadStrategy extends AbstractReadStrategy {
         Optional<String> fieldDelimiterOptional =
                 ReadonlyConfig.fromConfig(pluginConfig)
                         .getOptional(BaseSourceConfigOptions.FIELD_DELIMITER);
-        encoding =
+        this.encoding =
                 ReadonlyConfig.fromConfig(pluginConfig)
                         .getOptional(BaseSourceConfigOptions.ENCODING)
                         .orElse(StandardCharsets.UTF_8.name());
